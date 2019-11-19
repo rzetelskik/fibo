@@ -1,16 +1,47 @@
-#include <functional>
 #include "fibo.h"
 
 Fibo::Fibo(const std::string& str) {
+    //TODO sanity check moodle
     this->bits = boost::dynamic_bitset<>(str);
-    normalise();
+    normaliseBits();
 }
 
-void Fibo::normalise() {
-    //TODO
+void Fibo::clearLeadingZeroBits() {
+    size_t i = this->length() - 1;
+    while (i > 0 && !this->bits[i]) --i;
+
+    this->bits.resize(i + 1);
 }
 
-Fibo::Fibo(unsigned long n) {
+void Fibo::clearBitsInRange(size_t begin, size_t end) {
+    if (end < begin) std::swap(begin, end);
+    for (size_t i = begin; i <= end; i++) {
+        this->bits[i] = false;
+    }
+}
+
+void Fibo::normaliseBits() {
+    clearLeadingZeroBits();
+
+    this->bits.push_back(false);
+    size_t memZero = this->length() - 1, lowestSetBit = this->bits.find_first();
+
+    for (size_t i = this->length() - 2; i > lowestSetBit; i--) {
+        if (!this->bits[i] && !this->bits[i - 1]) {
+            memZero = i - 1;
+        } else if (this->bits[i] && this->bits[i - 1]) {
+            this->bits[memZero] = true;
+            clearBitsInRange(memZero - 1, i - 1);
+            memZero = i - 1;
+        }
+    }
+
+    clearLeadingZeroBits();
+}
+
+Fibo::Fibo(long long n) {
+    //TODO sanity check moodle
+    if (n < 0) throw std::invalid_argument("Negative value provided.");
     //TODO
 }
 
@@ -21,15 +52,27 @@ Fibo& Fibo::operator=(const Fibo& other) {
     return *this;
 }
 
+bool Fibo::getOrDefault(size_t i, bool value) const {
+    if (this->length() > i) {
+        return this->bits[i];
+    }
+    return value;
+}
+
 Fibo& Fibo::performBitwiseOperation(const Fibo& other, const BitFunction& f) {
-    size_t min = std::min(this->length(), other.length());
+    size_t min = this->length(), max = other.length();
+    if (max < min) std::swap(min, max);
+
     for (size_t i = 0; i < min; i++) {
         this->bits[i] = f(this->bits[i], other.bits[i]);
     }
-    for (size_t i = min; i < other.length(); i++) {
-        this->bits.push_back(f(other.bits[i], false));
+
+    if (this->length() < max) this->bits.resize(max, false);
+    for (size_t i = min; i < max; i++) {
+        this->bits[i] = f(this->bits[i], other.getOrDefault(i, false));
     }
 
+    normaliseBits();
     return *this;
 }
 
@@ -51,11 +94,10 @@ Fibo& Fibo::operator^=(const Fibo &other) {
     return performBitwiseOperation(other, std::bit_xor<>());
 };
 
-Fibo& Fibo::operator<<=(unsigned long n) {
-    //TODO exception for n < 0?
-    if (!n) {
-        return *this;
-    }
+Fibo& Fibo::operator<<=(long long n) {
+    if (!n) return *this;
+    //TODO co robimy dla n < 0?
+    if (n < 0) throw std::invalid_argument("Invalid argument provided");
 
     this->bits.resize(this->length() + n, false);
     this->bits <<= n;
@@ -78,7 +120,7 @@ const Fibo Fibo::operator^(const Fibo& other) const {
     return Fibo(*this) ^= other;
 }
 
-const Fibo Fibo::operator<<(unsigned long n) const {
+const Fibo Fibo::operator<<(long long n) const {
     return Fibo(*this) <<= n;
 }
 

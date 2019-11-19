@@ -2,35 +2,37 @@
 #define FIBO_FIBO_H
 
 #include <boost/dynamic_bitset.hpp>
+#include <functional>
 
 using BitFunction = std::function<bool(bool, bool)>;
 
 class Fibo {
 private:
     boost::dynamic_bitset<> bits;
-    void normalise();
+    void clearBitsInRange(size_t begin, size_t end);
+    void clearLeadingZeroBits();
+    void normaliseBits();
+    [[nodiscard]] bool getOrDefault(size_t i, bool value) const;
     Fibo& performBitwiseOperation(const Fibo& other, const BitFunction& f);
 public:
-    // Sets all bits to zeros by default.
-    Fibo() : bits(1) {};
-    Fibo(const Fibo& other) : bits(other.bits) {};
+    Fibo() : bits(1, false) {};
+    Fibo(const Fibo& other) = default;
     ~Fibo() = default;
     explicit Fibo(const std::string& str);
-    //TODO int? long long?
-    explicit Fibo(unsigned long n);
+    explicit Fibo(long long n);
 
     Fibo& operator=(const Fibo& other);
     Fibo& operator+=(const Fibo& other);
     Fibo& operator&=(const Fibo& other);
     Fibo& operator|=(const Fibo& other);
     Fibo& operator^=(const Fibo& other);
-    Fibo& operator<<=(unsigned long n);
+    Fibo& operator<<=(long long n);
 
     const Fibo operator+(const Fibo& other) const;
     const Fibo operator&(const Fibo& other) const;
     const Fibo operator|(const Fibo& other) const;
     const Fibo operator^(const Fibo& other) const;
-    const Fibo operator<<(unsigned long n) const;
+    const Fibo operator<<(long long n) const;
 
     bool operator==(const Fibo& other) const;
     bool operator<(const Fibo& other) const;
@@ -40,7 +42,7 @@ public:
     bool operator>=(const Fibo& other) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Fibo& fibo);
-    [[nodiscard]] unsigned long length() const;
+    [[nodiscard]] unsigned long long length() const;
 };
 
 const Fibo Zero();
