@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "fibo.h"
 
 Fibo::Fibo(const std::string& str) {
@@ -42,7 +44,26 @@ void Fibo::normaliseBits() {
 Fibo::Fibo(long long n) {
     //TODO sanity check moodle
     if (n < 0) throw std::invalid_argument("Negative value provided.");
-    //TODO
+    if (n == 0) {
+        this->bits.push_back(0);
+        return;
+    }
+    std::vector<long long> fibs;
+    int a = 1, b = 1;
+    while (b <= n) {
+        fibs.push_back(b);
+        int tmp = b;
+        b += a;  //TODO: Here is a risk of IntOverflow
+        a = tmp;
+    }
+    this->bits.resize(fibs.size(), 0);
+    for (int i = fibs.size() - 1; i >= 0; i--) {
+        int fib = fibs[i];
+        if (fib <= n) {
+            n -= fib;
+            this->bits[i] = 1;
+        }
+    }
 }
 
 Fibo& Fibo::operator=(const Fibo& other) {
@@ -124,7 +145,7 @@ const Fibo Fibo::operator<<(long long n) const {
     return Fibo(*this) <<= n;
 }
 
-unsigned long Fibo::length() const {
+size_t Fibo::length() const {
     return bits.size();
 }
 
