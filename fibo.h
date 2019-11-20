@@ -9,6 +9,7 @@ using BitFunction = std::function<bool(bool, bool)>;
 class Fibo {
 private:
     boost::dynamic_bitset<> bits;
+    bool isStringValid(const std::string& str);
     void clearBitsInRange(size_t begin, size_t end);
     void clearLeadingZeroBits();
     void normaliseBits();
@@ -19,7 +20,10 @@ public:
     Fibo(const Fibo& other) = default;
     ~Fibo() = default;
     explicit Fibo(const std::string& str);
-    explicit Fibo(long long n);
+    Fibo(long long n);
+    template<typename T, typename =
+            typename std::enable_if_t<std::is_same<T, bool>::value || std::is_same<T, char>::value>>
+    explicit Fibo(T t) = delete;
 
     Fibo& operator=(const Fibo& other);
     Fibo& operator+=(const Fibo& other);

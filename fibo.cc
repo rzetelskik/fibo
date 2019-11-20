@@ -2,8 +2,16 @@
 
 #include "fibo.h"
 
+bool Fibo::isStringValid(const std::string& str) {
+    for (auto c: str) {
+        if ('1' < c || c < '0') return false;
+    }
+
+    return true;
+}
+
 Fibo::Fibo(const std::string& str) {
-    //TODO sanity check moodle
+    if (!isStringValid(str)) throw std::invalid_argument("Invalid argument provided.");
     this->bits = boost::dynamic_bitset<>(str);
     normaliseBits();
 }
@@ -42,7 +50,6 @@ void Fibo::normaliseBits() {
 }
 
 Fibo::Fibo(long long n) {
-    //TODO sanity check moodle
     if (n < 0) throw std::invalid_argument("Negative value provided.");
     if (n == 0) {
         this->bits.push_back(0);
@@ -56,7 +63,7 @@ Fibo::Fibo(long long n) {
         b += a;  //TODO: Here is a risk of IntOverflow
         a = tmp;
     }
-    this->bits.resize(fibs.size(), 0);
+    this->bits.resize(fibs.size(), false);
     for (int i = fibs.size() - 1; i >= 0; i--) {
         int fib = fibs[i];
         if (fib <= n) {
