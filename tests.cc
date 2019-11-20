@@ -23,25 +23,29 @@ BOOST_AUTO_TEST_CASE(constructors)
 
 BOOST_AUTO_TEST_CASE(compilation)
 {
-    //Fibo f1, f2;
-    //bool b;
+    Fibo f1, f2;
+    bool b;
 
     //Following test cases should cause compilation error.
     //Please comment out every test after it start causing an error.
-    Fibo f3(true);
-    BOOST_ERROR("Fibo(true) should not compile");
-    Fibo f4('a');
-    BOOST_ERROR("Fibo('a') should not compile");
-    //f1 += "10";
-    //BOOST_ERROR("f1 += 10 should not compile");
-    //f1 = f2 + "10";
-    //BOOST_ERROR("f1 = f2 + 10 should not compile");
-    //b = "10" < f2
-    //BOOST_ERROR("b = \"10\" < f2 should not compile");
-    //Zero() += Fibo("10");
-    //BOOST_ERROR("Zero() += Fibo("10") should not compile");
-    //One() += Fibo("10");
-    //BOOST_ERROR("One() += Fibo("10") should not compile");
+//    Fibo f3(true);
+//    BOOST_ERROR("Fibo(true) should not compile");
+//    Fibo f4('a');
+//    BOOST_ERROR("Fibo('a') should not compile");
+//    f1 += "10";
+//    BOOST_ERROR("f1 += \"10\" should not compile");
+//    f1 = f2 + "10";
+//    BOOST_ERROR("f1 = f2 + \"10\" should not compile");
+//    b = "10" < f2
+//    BOOST_ERROR("b = \"10\" < f2 should not compile");
+//    Zero() += Fibo("10");
+//    BOOST_ERROR("Zero() += Fibo("10") should not compile");
+//    One() += Fibo("10");
+//    BOOST_ERROR("One() += Fibo("10") should not compile");
+
+    BOOST_CHECK((Fibo() += 2) == 2);
+    BOOST_CHECK((Fibo(2) = Fibo() + 2) == 2);
+//    BOOST_CHECK(b = 2 < f2);
 }
 
 BOOST_AUTO_TEST_CASE(print)
@@ -58,6 +62,15 @@ BOOST_AUTO_TEST_CASE(print)
 
     test_string << Fibo("11");
     BOOST_CHECK_EQUAL(test_string.str(), "100");
+}
+
+BOOST_AUTO_TEST_CASE(exceptions)
+{
+    BOOST_CHECK_THROW(Fibo("0123"), std::invalid_argument);
+    BOOST_CHECK_THROW(Fibo("abc"), std::invalid_argument);
+    BOOST_CHECK_NO_THROW(Fibo("0"));
+    BOOST_CHECK_NO_THROW(Fibo("1"));
+    BOOST_CHECK_NO_THROW(Fibo("0101"));
 }
 
 BOOST_AUTO_TEST_CASE(provided)
