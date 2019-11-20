@@ -23,7 +23,7 @@ public:
     Fibo(long long n);
     template<typename T, typename =
             typename std::enable_if_t<std::is_same<T, bool>::value || std::is_same<T, char>::value>>
-    Fibo(T t) = delete;
+    explicit Fibo(T t) = delete;
 
     Fibo& operator=(const Fibo& other);
     Fibo& operator+=(const Fibo& other);
