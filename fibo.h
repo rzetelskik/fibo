@@ -42,7 +42,7 @@ public:
     bool operator>=(const Fibo& other) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Fibo& fibo);
-    [[nodiscard]] unsigned long long length() const;
+    [[nodiscard]] size_t length() const;
 };
 
 const Fibo Zero();
