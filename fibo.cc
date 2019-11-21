@@ -104,9 +104,46 @@ Fibo& Fibo::performBitwiseOperation(const Fibo& other, const BitFunction& f) {
     return *this;
 }
 
-
 Fibo& Fibo::operator+=(const Fibo& other) {
-    //TODO
+    size_t len1 = length();
+    size_t len2 = other.length();
+    if (len1 < len2)
+        bits.resize(len2, false);
+    else if (len1 == len2)
+        bits.resize(len1 + 1, false);
+    bits.push_back(false);
+
+    bool rem[3] = {false, false, false};
+    int j = 0;
+    for (int i = len2 - 1; i >= 0; i--) {
+        if (!other.bits.test(i) && !rem[j]) {}
+        else if ((other.bits.test(i) && rem[j]) || bits.test(i)) {
+            if (bits.test(i + 1)) {
+                bits.set(i + 2, true);
+                rem[(j + 1) % 3] = true;
+            }
+            bits.flip(i + 1);
+            rem[(j + 2) % 3] = true;
+            if (!other.bits.test(i) || !rem[j])
+                bits.set(i, false);
+        } else {
+            bits.set(i, true);
+        }
+        if (bits.test(i) && bits.test(i + 1)) {
+            bits.flip(i);
+            bits.flip(i + 1);
+            bits.flip(i + 2);
+        }
+        rem[j] = false;
+        j = (j + 1) % 3;
+    }
+    if (rem[j] && bits.test(0)) {
+        bits.flip(0);
+        bits.set(1, true);
+    } else if (rem[j])
+        bits.set(0, true);
+
+    normaliseBits();
     return *this;
 }
 

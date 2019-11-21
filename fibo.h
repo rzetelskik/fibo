@@ -7,18 +7,10 @@
 using BitFunction = std::function<bool(bool, bool)>;
 
 class Fibo {
-private:
-    boost::dynamic_bitset<> bits;
-    bool isStringValid(const std::string& str);
-    void clearBitsInRange(size_t begin, size_t end);
-    void clearLeadingZeroBits();
-    void normaliseBits();
-    [[nodiscard]] bool getOrDefault(size_t i, bool value) const;
-    Fibo& performBitwiseOperation(const Fibo& other, const BitFunction& f);
 public:
     Fibo() : bits(1, false) {};
-    Fibo(const Fibo& other) = default;
     ~Fibo() = default;
+    Fibo(const Fibo& other) = default;
     explicit Fibo(const std::string& str);
     Fibo(long long n);
     template<typename T, typename =
@@ -47,6 +39,14 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Fibo& fibo);
     [[nodiscard]] size_t length() const;
+private:
+    boost::dynamic_bitset<> bits;
+    bool isStringValid(const std::string& str);
+    void clearBitsInRange(size_t begin, size_t end);
+    void clearLeadingZeroBits();
+    void normaliseBits();
+    [[nodiscard]] bool getOrDefault(size_t i, bool value) const;
+    Fibo& performBitwiseOperation(const Fibo& other, const BitFunction& f);
 };
 
 const Fibo Zero();
