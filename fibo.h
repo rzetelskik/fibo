@@ -2,14 +2,16 @@
 #define FIBO_FIBO_H
 
 #include <boost/dynamic_bitset.hpp>
+#include <boost/operators.hpp>
 #include <functional>
 
 using BitFunction = std::function<bool(bool, bool)>;
 
-class Fibo {
+class Fibo : boost::addable<Fibo>, boost::bitwise<Fibo>,
+        boost::left_shiftable<Fibo, long long>, boost::totally_ordered<Fibo> {
 private:
     boost::dynamic_bitset<> bits;
-    bool isStringValid(const std::string& str);
+    static bool isStringValid(const std::string& str);
     void clearBitsInRange(size_t begin, size_t end);
     void clearLeadingZeroBits();
     void normaliseBits();
@@ -18,13 +20,14 @@ private:
 public:
     Fibo() : bits(1, false) {};
     Fibo(const Fibo& other) = default;
+    Fibo(Fibo&& other) noexcept : bits(std::move(other.bits)) {}
     ~Fibo() = default;
     explicit Fibo(const std::string& str);
-    Fibo(long long n);
-    template<typename T, typename =
-            typename std::enable_if_t<std::is_same<T, bool>::value || std::is_same<T, char>::value>>
-    explicit Fibo(T t) = delete;
-
+    template<typename T, typename = typename std::enable_if<std::is_integral<T>::value
+            && !(std::is_same<T, bool>::value || std::is_same<T, char>::value
+            || std::is_same<T, wchar_t>::value || std::is_same<T, char16_t>::value
+            || std::is_same<T, char32_t >::value)>::type>
+    Fibo(T n);
     Fibo& operator=(const Fibo& other);
     Fibo& operator+=(const Fibo& other);
     Fibo& operator&=(const Fibo& other);
@@ -32,20 +35,10 @@ public:
     Fibo& operator^=(const Fibo& other);
     Fibo& operator<<=(long long n);
 
-    const Fibo operator+(const Fibo& other) const;
-    const Fibo operator&(const Fibo& other) const;
-    const Fibo operator|(const Fibo& other) const;
-    const Fibo operator^(const Fibo& other) const;
-    const Fibo operator<<(long long n) const;
-
-    bool operator==(const Fibo& other) const;
-    bool operator<(const Fibo& other) const;
-    bool operator<=(const Fibo& other) const;
-    bool operator!=(const Fibo& other) const;
-    bool operator>(const Fibo& other) const;
-    bool operator>=(const Fibo& other) const;
-
+    friend bool operator==(const Fibo& left, const Fibo& right);
+    friend bool operator<(const Fibo& left, const Fibo& right);
     friend std::ostream& operator<<(std::ostream& os, const Fibo& fibo);
+
     [[nodiscard]] size_t length() const;
 };
 

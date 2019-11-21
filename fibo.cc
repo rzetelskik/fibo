@@ -1,6 +1,5 @@
-#include <vector>
-
 #include "fibo.h"
+#include <vector>
 
 bool Fibo::isStringValid(const std::string& str) {
     for (auto c: str) {
@@ -14,6 +13,31 @@ Fibo::Fibo(const std::string& str) {
     if (!isStringValid(str)) throw std::invalid_argument("Invalid argument provided.");
     this->bits = boost::dynamic_bitset<>(str);
     normaliseBits();
+}
+
+template<typename T, typename>
+Fibo::Fibo(T n) {
+    if (n < 0) throw std::invalid_argument("Negative value provided.");
+    if (n == 0) {
+        this->bits.push_back(0);
+        return;
+    }
+    std::vector<long long> fibs;
+    int a = 1, b = 1;
+    while (b <= n) {
+        fibs.push_back(b);
+        int tmp = b;
+        b += a;  //TODO: Here is a risk of IntOverflow
+        a = tmp;
+    }
+    this->bits.resize(fibs.size(), false);
+    for (int i = fibs.size() - 1; i >= 0; i--) {
+        int fib = fibs[i];
+        if (fib <= n) {
+            n -= fib;
+            this->bits[i] = true;
+        }
+    }
 }
 
 void Fibo::clearLeadingZeroBits() {
@@ -47,30 +71,6 @@ void Fibo::normaliseBits() {
     }
 
     clearLeadingZeroBits();
-}
-
-Fibo::Fibo(long long n) {
-    if (n < 0) throw std::invalid_argument("Negative value provided.");
-    if (n == 0) {
-        this->bits.push_back(0);
-        return;
-    }
-    std::vector<long long> fibs;
-    int a = 1, b = 1;
-    while (b <= n) {
-        fibs.push_back(b);
-        int tmp = b;
-        b += a;  //TODO: Here is a risk of IntOverflow
-        a = tmp;
-    }
-    this->bits.resize(fibs.size(), false);
-    for (int i = fibs.size() - 1; i >= 0; i--) {
-        int fib = fibs[i];
-        if (fib <= n) {
-            n -= fib;
-            this->bits[i] = 1;
-        }
-    }
 }
 
 Fibo& Fibo::operator=(const Fibo& other) {
@@ -124,65 +124,24 @@ Fibo& Fibo::operator^=(const Fibo &other) {
 
 Fibo& Fibo::operator<<=(long long n) {
     if (!n) return *this;
-    //TODO co robimy dla n < 0?
-    if (n < 0) throw std::invalid_argument("Invalid argument provided");
+    if (n < 0) throw std::invalid_argument("Negative value provided");
 
     this->bits.resize(this->length() + n, false);
     this->bits <<= n;
     return *this;
 }
 
-const Fibo Fibo::operator+(const Fibo& other) const {
-    return Fibo(*this) += other;
+bool operator==(const Fibo& left, const Fibo& right) {
+    return left.bits == right.bits;
 }
 
-const Fibo Fibo::operator&(const Fibo& other) const {
-    return Fibo(*this) &= other;
-}
-
-const Fibo Fibo::operator|(const Fibo& other) const {
-    return Fibo(*this) |= other;
-}
-
-const Fibo Fibo::operator^(const Fibo& other) const {
-    return Fibo(*this) ^= other;
-}
-
-const Fibo Fibo::operator<<(long long n) const {
-    return Fibo(*this) <<= n;
-}
-
-size_t Fibo::length() const {
-    return bits.size();
+bool operator<(const Fibo& left, const Fibo& right) {
+    return left.bits < right.bits;
 }
 
 std::ostream& operator<<(std::ostream& os, const Fibo& fibo) {
     os << fibo.bits;
     return os;
-}
-
-bool Fibo::operator==(const Fibo& other) const {
-    return this->bits == other.bits;
-}
-
-bool Fibo::operator<(const Fibo& other) const {
-    return this->bits < other.bits;
-}
-
-bool Fibo::operator<=(const Fibo& other) const {
-    return this->bits <= other.bits;
-}
-
-bool Fibo::operator!=(const Fibo& other) const {
-    return this->bits != other.bits;
-}
-
-bool Fibo::operator>(const Fibo& other) const {
-    return this->bits > other.bits;
-}
-
-bool Fibo::operator>=(const Fibo& other) const {
-    return this->bits >= other.bits;
 }
 
 const Fibo Zero() {
@@ -191,4 +150,8 @@ const Fibo Zero() {
 
 const Fibo One() {
     return Fibo(1);
+}
+
+size_t Fibo::length() const {
+    return bits.size();
 }
