@@ -122,9 +122,8 @@ Fibo& Fibo::operator^=(const Fibo &other) {
     return performBitwiseOperation(other, std::bit_xor<>());
 };
 
-Fibo& Fibo::operator<<=(long long n) {
+Fibo& Fibo::operator<<=(size_t n) {
     if (!n) return *this;
-    if (n < 0) throw std::invalid_argument("Negative value provided");
 
     this->bits.resize(this->length() + n, false);
     this->bits <<= n;

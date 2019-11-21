@@ -8,7 +8,7 @@
 using BitFunction = std::function<bool(bool, bool)>;
 
 class Fibo : boost::addable<Fibo>, boost::bitwise<Fibo>,
-        boost::left_shiftable<Fibo, long long>, boost::totally_ordered<Fibo> {
+        boost::left_shiftable<Fibo, size_t>, boost::totally_ordered<Fibo> {
 private:
     boost::dynamic_bitset<> bits;
     static bool isStringValid(const std::string& str);
@@ -33,7 +33,7 @@ public:
     Fibo& operator&=(const Fibo& other);
     Fibo& operator|=(const Fibo& other);
     Fibo& operator^=(const Fibo& other);
-    Fibo& operator<<=(long long n);
+    Fibo& operator<<=(size_t n);
 
     friend bool operator==(const Fibo& left, const Fibo& right);
     friend bool operator<(const Fibo& left, const Fibo& right);
