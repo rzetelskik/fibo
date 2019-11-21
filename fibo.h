@@ -12,7 +12,7 @@ class Fibo : boost::addable<Fibo>,
              boost::left_shiftable<Fibo, size_t>,
              boost::totally_ordered<Fibo> {
 public:
-  Fibo() : bits(1, false){};
+  Fibo();
   Fibo(const Fibo &other) = default;
   Fibo(Fibo &&other) noexcept : bits(std::move(other.bits)) {}
   ~Fibo() = default;
@@ -40,6 +40,7 @@ public:
 
 private:
   boost::dynamic_bitset<> bits;
+  void initZero();
   void clearBitsInRange(size_t begin, size_t end);
   void clearLeadingZeroBits();
   void normaliseBits();
@@ -47,8 +48,8 @@ private:
   Fibo &performBitwiseOperation(const Fibo &other, const BitFunction &f);
 };
 
-const Fibo Zero();
+const Fibo& Zero();
 
-const Fibo One();
+const Fibo& One();
 
 #endif // FIBO_FIBO_H

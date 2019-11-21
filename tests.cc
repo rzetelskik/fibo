@@ -21,7 +21,6 @@ BOOST_AUTO_TEST_CASE(constructors)
     BOOST_CHECK_EQUAL(Fibo("10010010"), Fibo(44));
     BOOST_CHECK_EQUAL(Fibo("100101001001010"), Fibo(1337));
     BOOST_CHECK_EQUAL(Fibo("1"), Fibo("1"));
-    BOOST_CHECK_EQUAL(Fibo("1"), Fibo("001"));
 }
 
 BOOST_AUTO_TEST_CASE(compilation)
@@ -75,10 +74,18 @@ BOOST_AUTO_TEST_CASE(print)
 BOOST_AUTO_TEST_CASE(exceptions)
 {
     BOOST_CHECK_THROW(Fibo("0123"), std::invalid_argument);
+    BOOST_CHECK_THROW(Fibo("001"), std::invalid_argument);
     BOOST_CHECK_THROW(Fibo("abc"), std::invalid_argument);
+    BOOST_CHECK_THROW(Fibo(-9876543210LL), std::invalid_argument);
     BOOST_CHECK_NO_THROW(Fibo("0"));
     BOOST_CHECK_NO_THROW(Fibo("1"));
-    BOOST_CHECK_NO_THROW(Fibo("0101"));
+    BOOST_CHECK_NO_THROW(Fibo("101"));
+    BOOST_CHECK_NO_THROW(Fibo(9876543210LL));
+}
+
+BOOST_AUTO_TEST_CASE(comaparators) {
+  BOOST_CHECK(Fibo("100100") > Fibo("101"));
+  BOOST_CHECK(Fibo("101") > Fibo("100"));
 }
 
 BOOST_AUTO_TEST_CASE(addition)
