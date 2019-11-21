@@ -46,7 +46,7 @@ bool isStringValid(const std::string &str) {
 Fibo::Fibo(const std::string &str) {
   if (!isStringValid(str))
     throw std::invalid_argument("Invalid argument provided.");
-  this->bits = boost::dynamic_bitset<>(str);
+  bits = boost::dynamic_bitset<>(str);
   normaliseBits();
 }
 
@@ -74,31 +74,31 @@ Fibo::Fibo(long long n) {
 
 void Fibo::clearLeadingZeroBits() {
   size_t i = this->length() - 1;
-  while (i > 0 && !this->bits[i])
+  while (i > 0 && !bits.test(i))
     --i;
 
-  this->bits.resize(i + 1);
+  bits.resize(i + 1);
 }
 
 void Fibo::clearBitsInRange(size_t begin, size_t end) {
   if (end < begin)
     std::swap(begin, end);
   for (size_t i = begin; i <= end; i++) {
-    this->bits[i] = false;
+    bits.set(i, false);
   }
 }
 
 void Fibo::normaliseBits() {
   clearLeadingZeroBits();
 
-  this->bits.push_back(false);
-  size_t memZero = this->length() - 1, lowestSetBit = this->bits.find_first();
+  bits.push_back(false);
+  size_t memZero = length() - 1, lowestSetBit = bits.find_first();
 
-  for (size_t i = this->length() - 2; i > lowestSetBit; i--) {
-    if (!this->bits[i] && !this->bits[i - 1]) {
+  for (size_t i = length() - 2; i > lowestSetBit; i--) {
+    if (!bits.test(i) && !bits.test(i - 1)) {
       memZero = i - 1;
-    } else if (this->bits[i] && this->bits[i - 1]) {
-      this->bits[memZero] = true;
+    } else if (bits.test(i) && bits.test(i - 1)) {
+      bits.set(memZero, true);
       clearBitsInRange(memZero - 1, i - 1);
       memZero = i - 1;
     }
@@ -115,25 +115,25 @@ Fibo &Fibo::operator=(const Fibo &other) {
 }
 
 bool Fibo::getOrDefault(size_t i, bool value) const {
-  if (this->length() > i) {
-    return this->bits[i];
+  if (length() > i) {
+    return bits.test(i);
   }
   return value;
 }
 
 Fibo &Fibo::performBitwiseOperation(const Fibo &other, const BitFunction &f) {
-  size_t min = this->length(), max = other.length();
+  size_t min = length(), max = other.length();
   if (max < min)
     std::swap(min, max);
 
   for (size_t i = 0; i < min; i++) {
-    bits.set(i, f(this->bits[i], other.bits[i]));
+    bits.set(i, f(bits.test(i), other.bits.test(i)));
   }
 
-  if (this->length() < max)
-    this->bits.resize(max, false);
+  if (length() < max)
+    bits.resize(max, false);
   for (size_t i = min; i < max; i++) {
-    bits.set(i, f(this->bits[i], other.getOrDefault(i, false)));
+    bits.set(i, f(bits.test(i), other.getOrDefault(i, false)));
   }
 
   normaliseBits();
@@ -176,8 +176,9 @@ Fibo &Fibo::operator+=(const Fibo &other) {
   if (rem[j] && bits.test(0)) {
     bits.flip(0);
     bits.set(1, true);
-  } else if (rem[j])
+  } else if (rem[j]) {
     bits.set(0, true);
+  }
 
   normaliseBits();
   return *this;
@@ -199,8 +200,8 @@ Fibo &Fibo::operator<<=(size_t n) {
   if (!n)
     return *this;
 
-  this->bits.resize(this->length() + n, false);
-  this->bits <<= n;
+  bits.resize(length() + n, false);
+  bits <<= n;
   return *this;
 }
 
