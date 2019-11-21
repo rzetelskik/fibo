@@ -76,9 +76,11 @@ BOOST_AUTO_TEST_CASE(exceptions)
     BOOST_CHECK_THROW(Fibo("0123"), std::invalid_argument);
     BOOST_CHECK_THROW(Fibo("001"), std::invalid_argument);
     BOOST_CHECK_THROW(Fibo("abc"), std::invalid_argument);
+    BOOST_CHECK_THROW(Fibo(-9876543210LL), std::invalid_argument);
     BOOST_CHECK_NO_THROW(Fibo("0"));
     BOOST_CHECK_NO_THROW(Fibo("1"));
     BOOST_CHECK_NO_THROW(Fibo("101"));
+    BOOST_CHECK_NO_THROW(Fibo(9876543210LL));
 }
 
 BOOST_AUTO_TEST_CASE(comaparators) {

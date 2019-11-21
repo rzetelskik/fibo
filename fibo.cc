@@ -3,9 +3,9 @@
 #include <vector>
 
 namespace {
-std::vector<long long> &fibonacciVector() {
+std::vector<unsigned long long> &fibonacciVector() {
   static size_t maxFit = 91;
-  static std::vector<long long> fibonacciVector(maxFit, 0);
+  static std::vector<unsigned long long> fibonacciVector(maxFit, 0);
   return fibonacciVector;
 }
 
@@ -21,7 +21,7 @@ void fibonacciComputeIfAbsent(size_t pos) {
                            ((pos > 1) ? fibonacciVector()[pos - 2] : 1);
 }
 
-size_t fibonacciGetBestFit(long long n) {
+size_t fibonacciGetBestFit(unsigned long long n) {
   size_t pos = 0;
   fibonacciComputeIfAbsent(pos);
 
@@ -45,6 +45,14 @@ bool isStringValid(const std::string &str) {
 }
 } // namespace
 
+void Fibo::initZero() {
+  bits = boost::dynamic_bitset(1, false);
+}
+
+Fibo::Fibo() {
+  initZero();
+}
+
 Fibo::Fibo(const std::string &str) {
   if (!isStringValid(str)) {
     throw std::invalid_argument("Invalid string format.");
@@ -58,7 +66,7 @@ Fibo::Fibo(long long n) {
     throw std::invalid_argument("Negative value provided.");
   }
   if (n == 0) {
-    *this = Fibo();
+    initZero();
     return;
   }
 
@@ -233,8 +241,14 @@ std::ostream &operator<<(std::ostream &os, const Fibo &fibo) {
   return os;
 }
 
-const Fibo Zero() { return Fibo(); }
+const Fibo& Zero() {
+  static Fibo fibo;
+  return fibo;
+}
 
-const Fibo One() { return Fibo(1); }
+const Fibo& One() {
+  static Fibo fibo("1");
+  return fibo;
+}
 
 size_t Fibo::length() const { return bits.size(); }
