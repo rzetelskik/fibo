@@ -1,12 +1,44 @@
 #include "fibo.h"
 #include <vector>
+#include <iostream>
 
-bool Fibo::isStringValid(const std::string& str) {
-    for (auto c: str) {
-        if ('1' < c || c < '0') return false;
+namespace {
+    std::vector<long long>& fibonacciVector() {
+        static size_t maxFit = 91;
+        static std::vector<long long> fibonacciVector(maxFit, 0);
+        return fibonacciVector;
     }
 
-    return true;
+    void fibonacciComputeIfAbsent(size_t pos) {
+        if (fibonacciVector().size() <= pos) {
+            //TODO throw exception instead?
+            fibonacciVector().resize(pos, 0);
+        }
+        if (fibonacciVector()[pos]) return;
+
+        fibonacciVector()[pos] = ((pos > 0) ? fibonacciVector()[pos - 1] : 0)
+                                 + ((pos > 1) ? fibonacciVector()[pos - 2] : 1);
+    }
+
+    size_t fibonacciGetBestFit(long long n) {
+        size_t pos = 0;
+        fibonacciComputeIfAbsent(pos);
+
+        do {
+            fibonacciComputeIfAbsent(pos);
+        } while (fibonacciVector()[pos++] <= n);
+
+        return --pos;
+    }
+
+    bool isStringValid(const std::string& str) {
+        //TODO leading zeros!
+        for (auto c: str) {
+            if ('1' < c || c < '0') return false;
+        }
+
+        return true;
+    }
 }
 
 Fibo::Fibo(const std::string& str) {
@@ -18,26 +50,24 @@ Fibo::Fibo(const std::string& str) {
 Fibo::Fibo(long long n) {
     if (n < 0) throw std::invalid_argument("Negative value provided.");
     if (n == 0) {
-        this->bits.push_back(0);
+        *this = Fibo();
         return;
     }
-    std::vector<long long> fibs;
-    int a = 1, b = 1;
-    while (b <= n) {
-        fibs.push_back(b);
-        int tmp = b;
-        b += a;  //TODO: Here is a risk of IntOverflow
-        a = tmp;
-    }
-    this->bits.resize(fibs.size(), false);
-    for (int i = fibs.size() - 1; i >= 0; i--) {
-        int fib = fibs[i];
+
+    size_t maxPos = fibonacciGetBestFit(n);
+    bits.resize(maxPos, false);
+
+    long long fib = n;
+    for (size_t i = maxPos; i <= maxPos && fib > 0; i--) {
+        fib = fibonacciVector()[i];
+
         if (fib <= n) {
             n -= fib;
-            this->bits[i] = true;
+            bits.set(i, true);
         }
     }
 }
+
 
 void Fibo::clearLeadingZeroBits() {
     size_t i = this->length() - 1;
@@ -91,12 +121,12 @@ Fibo& Fibo::performBitwiseOperation(const Fibo& other, const BitFunction& f) {
     if (max < min) std::swap(min, max);
 
     for (size_t i = 0; i < min; i++) {
-        this->bits[i] = f(this->bits[i], other.bits[i]);
+        bits.set(i, f(this->bits[i], other.bits[i]));
     }
 
     if (this->length() < max) this->bits.resize(max, false);
     for (size_t i = min; i < max; i++) {
-        this->bits[i] = f(this->bits[i], other.getOrDefault(i, false));
+        bits.set(i, f(this->bits[i], other.getOrDefault(i, false)));
     }
 
     normaliseBits();
@@ -114,7 +144,7 @@ Fibo& Fibo::operator+=(const Fibo& other) {
 
     bool rem[3] = {false, false, false};
     int j = 0;
-    for (int i = len2 - 1; i >= 0; i--) {
+    for (size_t i = len2; i --> 0;) {
         if (!other.bits.test(i) && !rem[j]) {}
         else if ((other.bits.test(i) && rem[j]) || bits.test(i)) {
             if (bits.test(i + 1)) {

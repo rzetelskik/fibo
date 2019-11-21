@@ -35,7 +35,6 @@ public:
     [[nodiscard]] size_t length() const;
 private:
     boost::dynamic_bitset<> bits;
-    bool isStringValid(const std::string& str);
     void clearBitsInRange(size_t begin, size_t end);
     void clearLeadingZeroBits();
     void normaliseBits();
