@@ -1,7 +1,7 @@
 #include "fibo.h"
 
-#include <cassert>
 #include <iostream>
+#include <sstream>
 
 #define BOOST_TEST_MODULE example
 #include <boost/test/included/unit_test.hpp>
@@ -12,10 +12,13 @@ BOOST_AUTO_TEST_CASE(constructors)
     BOOST_CHECK_EQUAL(Fibo(0), f);
     BOOST_CHECK_EQUAL(Fibo(0), Fibo(f));
     BOOST_CHECK_EQUAL(Fibo(0), Zero());
+    BOOST_CHECK_EQUAL(Fibo(0), Fibo());
     BOOST_CHECK_EQUAL(Fibo(0), Fibo("0"));
     BOOST_CHECK_EQUAL(Fibo(1), Fibo(1));
     BOOST_CHECK_EQUAL(Fibo(1), One());
     BOOST_CHECK_EQUAL(Fibo("1"), Fibo(1));
+    BOOST_CHECK_EQUAL(Fibo("1000101"), Fibo(25));
+    BOOST_CHECK_EQUAL(Fibo("10010010"), Fibo(44));
     BOOST_CHECK_EQUAL(Fibo("100101001001010"), Fibo(1337));
     BOOST_CHECK_EQUAL(Fibo("1"), Fibo("1"));
     BOOST_CHECK_EQUAL(Fibo("1"), Fibo("001"));
@@ -43,6 +46,8 @@ BOOST_AUTO_TEST_CASE(compilation)
 //    One() += Fibo("10");
 //    BOOST_ERROR("One() += Fibo("10") should not compile");
 
+    // Following checks should compile.
+    // Make sure those are uncommented when implementation is ready.
     BOOST_CHECK((Fibo() += 2) == 2);
     BOOST_CHECK((Fibo(2) = Fibo() + 2) == 2);
     BOOST_CHECK(b = 2 < f2);
@@ -71,6 +76,26 @@ BOOST_AUTO_TEST_CASE(exceptions)
     BOOST_CHECK_NO_THROW(Fibo("0"));
     BOOST_CHECK_NO_THROW(Fibo("1"));
     BOOST_CHECK_NO_THROW(Fibo("0101"));
+}
+
+BOOST_AUTO_TEST_CASE(addition)
+{
+    BOOST_REQUIRE_EQUAL(Fibo("101") + Fibo("101"), Fibo("1011"));
+    BOOST_REQUIRE_EQUAL(Fibo("1001") + Fibo("1001"), Fibo("10101"));
+    BOOST_REQUIRE_EQUAL(Fibo("1001") + Fibo("1010"), Fibo("10110"));
+    BOOST_CHECK_EQUAL(Fibo("1") += Fibo("1"), Fibo("10"));
+    BOOST_CHECK_EQUAL(Fibo("1") + Fibo("1"), Fibo("10"));
+    for (int i = 0; i < 1000; i++) {
+        for (int j = 0; j < 1000; j++) {
+            Fibo actual = Fibo(i) + Fibo(j);
+            Fibo expected = Fibo(i + j);
+            if (actual != expected) {
+                std::stringstream msg;
+                msg << "i = " << i << ", j = " << j << ", actual(" << actual << ") != expected(" << expected << ")";
+                BOOST_FAIL(msg.str());
+            }
+        }
+    }
 }
 
 BOOST_AUTO_TEST_CASE(provided)
