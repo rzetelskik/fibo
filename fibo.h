@@ -44,6 +44,8 @@ class Fibo : boost::addable<Fibo>,
     void clearBitsInRange(size_t begin, size_t end);
     void clearLeadingZeroBits();
     void adjustSizeForAddition(const Fibo &other);
+    void addOneBit(size_t i, bool bit, bool carry, bool *carry1, bool *carry2);
+    void normaliseLocalBits(size_t i);
     void normaliseBits();
     [[nodiscard]] bool getOrDefault(size_t i, bool value) const;
     Fibo &performBitwiseOperation(const Fibo &other, const BitFunction &f);

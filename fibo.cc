@@ -43,6 +43,12 @@ bool isStringValid(const std::string &str) {
 
     return true;
 }
+
+void rotateCarryBits(bool *b1, bool *b2, bool *b3) {
+    *b1 = *b2;
+    *b2 = *b3;
+    *b3 = false;
+}
 } // namespace
 
 void Fibo::initZero() { bits = boost::dynamic_bitset(1, false); }
@@ -160,38 +166,43 @@ void Fibo::adjustSizeForAddition(const Fibo &other) {
     bits.push_back(false);
 }
 
+void Fibo::normaliseLocalBits(size_t i) {
+    bits.set(i, false);
+    bits.set(i + 1, false);
+    bits.set(i + 2, true);
+}
+
+void Fibo::addOneBit(size_t i, bool bit, bool carry, bool *carry1, bool *carry2) {
+    if ((bit && carry) || bits.test(i)) {
+        if (bits.test(i + 1)) {
+            bits.set(i + 2, true); // Next previous bit is guaranteed to be 0 as
+            *carry1 = true;        // we keep bits normalised locally.
+        }
+        bits.flip(i + 1);
+        *carry2 = true;
+        if (!bit || !carry)
+            bits.set(i, false);
+    } else {
+        bits.set(i, true);
+    }
+}
+
 Fibo &Fibo::operator+=(const Fibo &other) {
     adjustSizeForAddition(other);
     bool carry = false, carry1 = false, carry2 = false;
-    for (int i = other.length() - 1; i >= 0; i--) {
-        if (!other.bits.test(i) && !carry) {
-        } else if ((other.bits.test(i) && carry) || bits.test(i)) {
-            if (bits.test(i + 1)) {
-                bits.set(i + 2, true);
-                carry1 = true;
-            }
-            bits.flip(i + 1);
-            carry2 = true;
-            if (!other.bits.test(i) || !carry)
-                bits.set(i, false);
-        } else {
-            bits.set(i, true);
-        }
-        if (bits.test(i) && bits.test(i + 1)) {
-            bits.set(i, false);
-            bits.set(i + 1, false);
-            bits.set(i + 2, true);
-        }
-        carry = carry1;
-        carry1 = carry2;
-        carry2 = false;
+    for (size_t i = other.length(); i-- > 0;) {
+        if (other.bits.test(i) || carry)
+            addOneBit(i, other.bits.test(i), carry, &carry1, &carry2);
+        if (bits.test(i) && bits.test(i + 1))
+            normaliseLocalBits(i);
+        rotateCarryBits(&carry, &carry1, &carry2);
     }
     if (carry && bits.test(0)) {
         bits.set(0, false);
         bits.set(1, true);
-    } else if (carry)
+    } else if (carry) {
         bits.set(0, true);
-
+    }
     normaliseBits();
     return *this;
 }
