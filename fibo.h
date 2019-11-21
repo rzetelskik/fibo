@@ -43,6 +43,7 @@ private:
   void initZero();
   void clearBitsInRange(size_t begin, size_t end);
   void clearLeadingZeroBits();
+  void adjustSizeForAddition(const Fibo &other);
   void normaliseBits();
   [[nodiscard]] bool getOrDefault(size_t i, bool value) const;
   Fibo &performBitwiseOperation(const Fibo &other, const BitFunction &f);
