@@ -42,15 +42,18 @@ BOOST_AUTO_TEST_CASE(compilation)
 //    b = "10" < f2
 //    BOOST_ERROR("b = \"10\" < f2 should not compile");
 //    Zero() += Fibo("10");
-//    BOOST_ERROR("Zero() += Fibo("10") should not compile");
+//    BOOST_ERROR("Zero() += Fibo(\"10\") should not compile");
+//    Zero() = Fibo("10");
+//    BOOST_ERROR("Zero() = Fibo(\"10\"); should not compile");
 //    One() += Fibo("10");
-//    BOOST_ERROR("One() += Fibo("10") should not compile");
+//    BOOST_ERROR("One() += Fibo(\"10\") should not compile");
 
     // Following checks should compile.
     // Make sure those are uncommented when implementation is ready.
     BOOST_CHECK((Fibo() += 2) == 2);
     BOOST_CHECK((Fibo(2) = Fibo() + 2) == 2);
     BOOST_CHECK(b = 2 < f2);
+    BOOST_CHECK(b = f2 > 2);
 }
 
 BOOST_AUTO_TEST_CASE(print)
