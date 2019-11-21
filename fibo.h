@@ -16,11 +16,11 @@ public:
     Fibo(Fibo&& other) noexcept : bits(std::move(other.bits)) {}
     ~Fibo() = default;
     explicit Fibo(const std::string& str);
-    template<typename T, typename = typename std::enable_if<std::is_integral<T>::value
-            && !(std::is_same<T, bool>::value || std::is_same<T, char>::value
-            || std::is_same<T, wchar_t>::value || std::is_same<T, char16_t>::value
-            || std::is_same<T, char32_t >::value)>::type>
-    Fibo(T n);
+    Fibo(long long n);
+    template <typename T, typename = typename std::enable_if<(std::is_same<T, bool>::value
+            || std::is_same<T, char>::value || std::is_same<T, wchar_t>::value
+            || std::is_same<T, char16_t>::value || std::is_same<T, char32_t>::value)>::type>
+    Fibo (T t) = delete;
     Fibo& operator=(const Fibo& other);
     Fibo& operator+=(const Fibo& other);
     Fibo& operator&=(const Fibo& other);

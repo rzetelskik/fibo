@@ -15,8 +15,7 @@ Fibo::Fibo(const std::string& str) {
     normaliseBits();
 }
 
-template<typename T, typename>
-Fibo::Fibo(T n) {
+Fibo::Fibo(long long n) {
     if (n < 0) throw std::invalid_argument("Negative value provided.");
     if (n == 0) {
         this->bits.push_back(0);
