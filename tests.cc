@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(compilation)
     // Make sure those are uncommented when implementation is ready.
     BOOST_CHECK((Fibo() += 2) == 2);
     BOOST_CHECK((Fibo(2) = Fibo() + 2) == 2);
-//    BOOST_CHECK(b = 2 < f2);
+    BOOST_CHECK(b = 2 < f2);
 }
 
 BOOST_AUTO_TEST_CASE(print)
